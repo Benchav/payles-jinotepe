@@ -5,99 +5,224 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Payless — Registro</title>
   <style>
-    :root{--bg:#0f1724;--accent:#ff6b35;--muted:#98a0b3;--glass:rgba(255,255,255,0.03)}
+    :root{
+      --bg:#0f1724;
+      --accent:#ff6b35;
+      --accent-2:#ff8a5b;
+      --muted:#98a0b3;
+      --glass:rgba(255,255,255,0.03);
+      --success:#9fe6b0;
+      --danger:#ffb4a2;
+    }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#071029 0%, #0f1724 100%);color:#e6eef8;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-    .card{width:480px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:22px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 30px rgba(2,6,23,0.6)}
-    .brand{display:flex;align-items:center;gap:12px;margin-bottom:16px}
-    .logo{width:48px;height:48px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#071022}
-    h1{font-size:18px;margin:0}
-    p.lead{margin:6px 0 16px;color:var(--muted);font-size:13px}
-    .form-grid{display:grid;grid-template-columns:1fr;gap:10px}
-    label{font-size:13px;color:var(--muted)}
-    input{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-    .actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px}
-    .btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit;cursor:pointer}
-    .btn.primary{background:linear-gradient(90deg,var(--accent),#ff8a5b);color:#071022;border:none}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background:linear-gradient(180deg,#071029 0%, #0f1724 100%);
+      color:#e6eef8;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Card */
+    .card{
+      width: min(480px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px;
+      padding:22px;
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow:0 10px 40px rgba(2,6,23,0.6);
+      backdrop-filter: blur(6px);
+    }
+
+    /* Header */
+    .brand{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+    .logo{
+      width:56px;height:56px;border-radius:12px;
+      background:linear-gradient(180deg,var(--accent),var(--accent-2));
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:#071022;font-size:18px;
+    }
+    h1{font-size:18px;margin:0;line-height:1.05}
+    p.lead{margin:6px 0 0;color:var(--muted);font-size:13px}
+
+    /* Form */
+    .form-grid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:6px}
+    label{display:block;margin-bottom:6px;font-size:13px;color:var(--muted)}
+    input[type="text"], input[type="password"]{
+      width:100%;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.04);
+      background:transparent;
+      color:inherit;
+      font-size:15px;
+      transition: box-shadow .12s ease, border-color .12s ease;
+    }
+    input::placeholder{color:rgba(230,238,248,0.34)}
+    input:focus{outline:none; box-shadow:0 0 0 6px rgba(255,107,53,0.06); border-color: rgba(255,107,53,0.14)}
+
+    /* Actions */
+    .actions{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.03);
+      background:transparent;
+      color:inherit;
+      cursor:pointer;
+      font-size:15px;
+    }
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#071022;border:none}
+    .btn:disabled{opacity:0.65;cursor:not-allowed}
     .muted{color:var(--muted);font-size:13px}
     a.link{color:var(--accent);text-decoration:none}
-    .msg{height:18px;font-size:13px;margin-top:6px}
+
+    /* Message */
+    .msg{min-height:20px;font-size:14px;margin-top:12px; color:var(--muted)}
+
+    /* Mobile tweaks */
+    @media (max-width:520px){
+      .card{padding:18px;border-radius:12px}
+      .brand{gap:10px}
+      .logo{width:48px;height:48px;font-size:16px}
+      .actions{
+        flex-direction:column-reverse;
+        align-items:stretch;
+      }
+      .actions .left{
+        width:100%;
+        display:flex;
+        gap:10px;
+      }
+      .btn{width:100%;padding:12px;border-radius:12px}
+      .actions .muted{width:100%;text-align:center;margin-top:6px}
+    }
+
+    /* Accessibility helper */
+    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
   </style>
 </head>
 <body>
-  <div class="card" role="main">
+  <main class="card" role="main" aria-labelledby="reg-title">
     <div class="brand">
-      <div class="logo">PS</div>
+      <div class="logo" aria-hidden="true">PS</div>
       <div>
-        <h1>Payless Jinotepe — Crear cuenta</h1>
+        <h1 id="reg-title">Payless SUC Jinotepe — Crear cuenta</h1>
         <p class="lead">Regístrate para acceder al panel administrativo</p>
       </div>
     </div>
 
-    <form id="regForm" autocomplete="on">
+    <form id="regForm" autocomplete="on" novalidate>
       <div class="form-grid">
         <div>
           <label for="username">Usuario</label>
-          <input id="username" name="username" type="text" placeholder="Tu usuario" required />
+          <input id="username" name="username" type="text" placeholder="Tu usuario" required aria-required="true" />
         </div>
+
         <div>
           <label for="password">Contraseña</label>
-          <input id="password" name="password" type="password" placeholder="Mínimo 6 caracteres" minlength="6" required />
+          <input id="password" name="password" type="password" placeholder="Mínimo 6 caracteres" minlength="6" required aria-required="true" />
         </div>
       </div>
 
       <div class="actions">
-        <div style="display:flex;gap:8px;align-items:center">
-          <button type="submit" class="btn primary">Crear cuenta</button>
-          <button type="button" class="btn" onclick="window.location.href='index.html'">Volver al login</button>
+        <div class="left" style="display:flex;gap:8px;align-items:center;flex:1;">
+          <button id="createBtn" type="submit" class="btn primary">Crear cuenta</button>
+          <button id="backBtn" type="button" class="btn">Volver al login</button>
         </div>
         <div class="muted">¿Ya tienes cuenta? <a class="link" href="index.html">Inicia sesión</a></div>
       </div>
 
-      <div class="msg" id="msg"></div>
+      <div id="msg" class="msg" role="status" aria-live="polite"></div>
     </form>
+  </main>
 
-    <script>
-      const API_BASE = 'https://payless-api.vercel.app';
-      const REGISTER_PATH = '/auth/register';
-      const msg = document.getElementById('msg');
+  <script>
+    // configuración (mantener igual)
+    const API_BASE = 'https://payless-api.vercel.app';
+    const REGISTER_PATH = '/auth/register';
+    const msgEl = document.getElementById('msg');
+    const createBtn = document.getElementById('createBtn');
+    const backBtn = document.getElementById('backBtn');
 
-      function showMsg(text, ok=true){
-        msg.textContent = text;
-        msg.style.color = ok ? '#9fe6b0' : '#ffb4a2';
+    // navegacion back
+    backBtn.addEventListener('click', () => {
+      // conserva comportamiento original (redirigir a index.html)
+      window.location.href = 'index.html';
+    });
+
+    // muestra mensajes con colores accesibles
+    function showMsg(text, ok = true) {
+      msgEl.textContent = text || '';
+      msgEl.style.color = ok ? getComputedStyle(document.documentElement).getPropertyValue('--success') : getComputedStyle(document.documentElement).getPropertyValue('--danger');
+    }
+
+    // bloquea botones durante petición para evitar doble envío
+    function setLoading(isLoading) {
+      createBtn.disabled = isLoading;
+      backBtn.disabled = isLoading;
+      if (isLoading) {
+        createBtn.classList.add('loading');
+        backBtn.classList.add('loading');
+      } else {
+        createBtn.classList.remove('loading');
+        backBtn.classList.remove('loading');
       }
+    }
 
-      async function apiRegister(username, password){
-        const url = API_BASE + REGISTER_PATH;
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, role: 'jinotepe' }) // role fijo
-        });
-        const data = await res.json().catch(()=>null);
-        if(!res.ok) throw new Error(data?.message || 'Error al registrar');
-        return data;
-      }
-
-      document.getElementById('regForm').addEventListener('submit', async function(e){
-        e.preventDefault();
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value;
-
-        if(!username || password.length < 6){ showMsg('Completa todos los campos (contraseña >=6)', false); return; }
-
-        showMsg('Creando cuenta...', true);
-
-        try{
-          await apiRegister(username, password);
-          showMsg('Cuenta creada correctamente. Redirigiendo al login...', true);
-          setTimeout(()=> window.location.href='index.html', 900);
-        }catch(err){
-          console.error('Registro error', err);
-          showMsg(err.message || 'Error al registrar', false);
-        }
+    // llamada a la API (misma lógica)
+    async function apiRegister(username, password) {
+      const url = API_BASE + REGISTER_PATH;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, role: 'jinotepe' }) // role fijo
       });
-    </script>
-  </div>
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.message || 'Error al registrar');
+      return data;
+    }
+
+    // submit del formulario
+    document.getElementById('regForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value || '';
+
+      if (!username || password.length < 6) {
+        showMsg('Completa todos los campos (contraseña >=6)', false);
+        return;
+      }
+
+      setLoading(true);
+      showMsg('Creando cuenta...', true);
+
+      try {
+        await apiRegister(username, password);
+        showMsg('Cuenta creada correctamente. Redirigiendo al login...', true);
+        // mantengo la redirección original
+        setTimeout(() => window.location.href = 'index.html', 900);
+      } catch (err) {
+        console.error('Registro error', err);
+        showMsg(err.message || 'Error al registrar', false);
+      } finally {
+        setLoading(false);
+      }
+    });
+  </script>
 </body>
 </html>
