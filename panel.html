@@ -76,7 +76,7 @@
       <div class="brand">
         <div class="logo">PS</div>
         <div>
-          <h1>Payless — Admin Jinotepe</h1>
+          <h1>Payless SUC Jinotepe — Admin</h1>
           <p class="muted">CRUD — Jinotepe</p>
         </div>
       </div>
@@ -84,9 +84,30 @@
       <nav>
         <ul>
           <li class="muted">Sucursales</li>
-          <li style="margin-top:10px"><button class="btn" onclick="selectBranch('jinotepe')">Jinotepe</button></li>
-          <li style="margin-top:6px"><button class="btn" onclick="selectBranch('chontales')">Chontales</button></li>
-          <li style="margin-top:6px"><button class="btn" onclick="selectBranch('masaya')">Masaya</button></li>
+             <li>
+  <div class="branch-btn" data-branch="jinotepe"
+       onclick="window.location.href='https://jinotepe.proyect.site/'">
+    <div class="branch-name">
+      <strong>Jinotepe</strong><span class="muted">(Managua Sur)</span>
+    </div>
+  </div>
+</li>
+         <li>
+  <div class="branch-btn" data-branch="chontales"
+       onclick="window.location.href='https://chontales.proyect.site/'">
+    <div class="branch-name">
+      <strong>Chontales</strong><span class="muted">(Regional)</span>
+    </div>
+  </div>
+</li>
+          <li>
+  <div class="branch-btn" data-branch="masaya"
+       onclick="window.location.href='https://masaya.proyect.site/'">
+    <div class="branch-name">
+      <strong>Masaya</strong><span class="muted">(Centro)</span>
+    </div>
+  </div>
+</li>
         </ul>
       </nav>
 
