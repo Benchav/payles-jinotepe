@@ -79,7 +79,8 @@ input:focus{box-shadow:0 0 0 4px rgba(255,107,53,0.06);border-color:rgba(255,107
 </style>
 </head>
 <body>
-<div class="card" role="region" aria-labelledby="login-title">
+<!-- Nota: aquí fijamos el rol esperado para este login. Cámbialo si reutilizas la plantilla. -->
+<div class="card" role="region" aria-labelledby="login-title" data-role="jinotepe">
   <div class="brand">
     <div class="logo" aria-hidden="true">PS</div>
     <div class="header-text">
@@ -110,29 +111,31 @@ input:focus{box-shadow:0 0 0 4px rgba(255,107,53,0.06);border-color:rgba(255,107
 </div>
 
 <script>
+/* CONFIG */
 const API_BASE = 'https://payless-api.vercel.app';
 const LOGIN_PATH = '/auth/login';
 const STORAGE_AUTH = 'payless_auth_v1';
 
-function showMsg(text, ok){
+/* Detect expected role from data-role attribute on the card */
+const cardEl = document.querySelector('.card');
+const EXPECTED_ROLE = cardEl && cardEl.dataset && cardEl.dataset.role ? cardEl.dataset.role.trim() : null;
+
+/* Utilities */
+function showMsg(text, ok = true){
   const el = document.getElementById('msg');
   el.textContent = text || '';
-  el.style.color = ok ? getComputedStyle(document.documentElement).getPropertyValue('--success') : getComputedStyle(document.documentElement).getPropertyValue('--danger');
+  // computed style fallback
+  let color = ok ? getComputedStyle(document.documentElement).getPropertyValue('--success') : getComputedStyle(document.documentElement).getPropertyValue('--danger');
+  if (!color) color = ok ? '#9fe6b0' : '#ffb4a2';
+  el.style.color = color.trim();
 }
 
 function setAuthToken(obj){
-  localStorage.setItem(STORAGE_AUTH, JSON.stringify(obj));
-}
-
-async function apiLogin(username, password){
-  const res = await fetch(API_BASE + LOGIN_PATH, {
-    method:'POST',
-    headers:{ 'Content-Type':'application/json' },
-    body: JSON.stringify({ username, password })
-  });
-  const data = await res.json().catch(()=>null);
-  if(!res.ok) throw new Error(data?.message || 'Error ' + res.status);
-  return data;
+  try {
+    localStorage.setItem(STORAGE_AUTH, JSON.stringify(obj));
+  } catch(e) {
+    console.error('No se pudo guardar auth en localStorage', e);
+  }
 }
 
 function setLoading(isLoading){
@@ -147,45 +150,109 @@ function setLoading(isLoading){
   }
 }
 
-document.getElementById('loginForm').addEventListener('submit', async e=>{
+/**
+ * Llama a la API de login y devuelve body parsed.
+ * Envía expectedRole si está presente.
+ * Lanza Error con message en caso de status != 2xx.
+ */
+async function apiLogin(username, password){
+  const body = { username, password };
+  if (EXPECTED_ROLE) body.expectedRole = EXPECTED_ROLE;
+
+  const res = await fetch(API_BASE + LOGIN_PATH, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  const data = await res.json().catch(()=>null);
+
+  if (res.status === 403) {
+    const msg = data?.message || 'No tienes permiso para iniciar sesión en este panel';
+    const err = new Error(msg);
+    err.status = 403;
+    throw err;
+  }
+
+  if (!res.ok) {
+    const msg = data?.message || data?.error || ('Error ' + res.status);
+    const err = new Error(msg);
+    err.status = res.status;
+    throw err;
+  }
+
+  return data;
+}
+
+/* Form submit */
+document.getElementById('loginForm').addEventListener('submit', async function (e){
   e.preventDefault();
 
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
 
-  if(!username || !password){ showMsg('Completa los campos', false); return; }
+  if (!username || !password) {
+    showMsg('Completa los campos', false);
+    return;
+  }
 
   setLoading(true);
   showMsg('Conectando...', true);
 
-  try{
+  try {
     const result = await apiLogin(username, password);
-    if(!result || !result.token) throw new Error('Token no recibido');
 
-    const user = { username };
-    setAuthToken({ token: result.token, user });
+    // extraer token (varios formatos comunes)
+    const token = result?.token || result?.accessToken || result?.access_token || result?.data?.token;
+    if (!token) throw new Error(result?.message || 'Token no recibido');
+
+    // Obtener role devuelto por la API (varias posibilidades)
+    const returnedRole = result?.role || result?.data?.role || (result?.user && result.user.role) || null;
+
+    // Cliente: verificar coincidencia de roles (UX). Backend ya debería haber rechazado si no coincide.
+    if (EXPECTED_ROLE && returnedRole && returnedRole !== EXPECTED_ROLE && returnedRole !== 'managua' && returnedRole !== 'admin') {
+      showMsg('Tu cuenta no tiene permiso para este panel.', false);
+      return;
+    }
+
+    // Guardar auth completo (token + user + meta)
+    const user = {
+      username: result?.user?.username || result?.username || username,
+      role: returnedRole || null,
+      id: result?.user?.id || result?.userId || null
+    };
+
+    const authObj = {
+      token,
+      user,
+      meta: {
+        expiresIn: result?.expiresIn || result?.expires_in || null,
+        obtainedAt: new Date().toISOString()
+      }
+    };
+
+    setAuthToken(authObj);
     showMsg('Inicio de sesión correcto. Redirigiendo...', true);
 
-    // Redirigir al panel (espera corta para que el usuario vea el mensaje)
-    setTimeout(()=> window.location.href='panelJinotepe.html', 600);
-  }catch(err){
-    console.error(err);
+    // Redirección por panel: aquí, plantilla de Jinotepe
+    // Si tienes páginas por rol, puedes cambiar según returnedRole
+    setTimeout(()=> window.location.href = 'panelJinotepe.html', 600);
+  } catch (err) {
+    console.error('login error', err);
     showMsg(err.message || 'Error en login', false);
-  }finally{
+  } finally {
     setLoading(false);
   }
 });
 
-// Demo button fills form and triggers submit
-document.getElementById('demoBtn').addEventListener('click', ()=>{
-  // fill demo credentials
-  document.getElementById('username').value='adminjinotepe';
-  document.getElementById('password').value='123456';
-  // trigger submit programmatically
-  document.getElementById('loginForm').dispatchEvent(new Event('submit',{cancelable:true,bubbles:true}));
+/* Demo button (ajusta credenciales según tu entorno) */
+document.getElementById('demoBtn').addEventListener('click', function (){
+  // demo credentials for Jinotepe - ajusta si tus demo users tienen otros nombres/passwords
+  document.getElementById('username').value = 'adminjinotepe';
+  document.getElementById('password').value = '123456';
+  // disparar submit
+  document.getElementById('loginForm').dispatchEvent(new Event('submit', { cancelable:true, bubbles:true }));
 });
-
-// Optional: better keyboard support — submit on Enter (handled by form) and prevent accidental double submits
 </script>
 </body>
 </html>
