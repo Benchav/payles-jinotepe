@@ -367,7 +367,7 @@ input:focus-visible {
       <button id="submitBtn" type="submit" class="btn primary">
         <span>Entrar</span>
       </button>
-      <button type="button" id="demoBtn" class="btn secondary">Usar demo</button>
+   <!--  <button type="button" id="demoBtn" class="btn secondary">Usar demo</button> -->
     </div>
 
     <div class="muted">¿No tienes cuenta? <a class="link" href="register.html">Regístrate aquí</a></div>
@@ -416,14 +416,14 @@ function setAuthToken(obj){
 
 function setLoading(isLoading){
   const btn = document.getElementById('submitBtn');
-  const demo = document.getElementById('demoBtn');
+ /* const demo = document.getElementById('demoBtn');
   if(isLoading){
     btn.disabled = true; demo.disabled = true;
     btn.classList.add('loading'); demo.classList.add('loading');
   }else{
     btn.disabled = false; demo.disabled = false;
     btn.classList.remove('loading'); demo.classList.remove('loading');
-  }
+  }*/
 }
 
 /**
@@ -522,13 +522,13 @@ document.getElementById('loginForm').addEventListener('submit', async function (
 });
 
 /* Demo button (ajusta credenciales según tu entorno) */
-document.getElementById('demoBtn').addEventListener('click', function (){
+//document.getElementById('demoBtn').addEventListener('click', function (){
   // demo credentials for Jinotepe - ajusta si tus demo users tienen otros nombres/passwords
-  document.getElementById('username').value = 'adminjinotepe';
-  document.getElementById('password').value = '123456';
+//  document.getElementById('username').value = 'adminjinotepe';
+//  document.getElementById('password').value = '123456';
   // disparar submit
   document.getElementById('loginForm').dispatchEvent(new Event('submit', { cancelable:true, bubbles:true }));
-});
+//});
 
 /* Password visibility toggle */
 document.getElementById('togglePassword').addEventListener('click', function() {
